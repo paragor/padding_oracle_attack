@@ -32,7 +32,7 @@ func (a *PaddingOracleAttacker) Attack(iv []byte, msg []byte, blockSize int) ([]
 	plaintextOfBlocks := make([][]byte, len(cipherBlocks))
 	for i, chunk := range cipherBlocks {
 
-		a.logger.Printf("Start %d/%d chunk\n", i, len(cipherBlocks))
+		a.logger.Printf("Start %d/%d chunk\n", i, len(cipherBlocks)-1)
 		start := time.Now()
 		intermediateStateOfBlocks[i], err = a.attackBlock(chunk, blockSize)
 		if err != nil {
@@ -50,7 +50,7 @@ func (a *PaddingOracleAttacker) Attack(iv []byte, msg []byte, blockSize int) ([]
 			return nil, fmt.Errorf("cant recover plaintext from i2: xorerror: %w", err)
 		}
 
-		a.logger.Printf("Finish %d/%d chunk for %f seconds\n", i, len(cipherBlocks), time.Now().Sub(start).Seconds())
+		a.logger.Printf("Finish %d/%d chunk for %f seconds\n", i, len(cipherBlocks) - 1, time.Now().Sub(start).Seconds())
 	}
 
 	return helper.PKCS5Unpad(bytes.Join(plaintextOfBlocks, []byte{}), blockSize)
@@ -79,7 +79,6 @@ func (a *PaddingOracleAttacker) attackBlock(c2 []byte, blockSize int) ([]byte, e
 			}
 			if !isPaddingError {
 				i2[curPos] = byte(pad) ^ c1[curPos]
-				//i2[curPos] =  c1[curPos]
 				break
 			}
 			if i == 255 {
