@@ -65,9 +65,8 @@ func (a *PaddingOracleAttacker) attackBlock(c2 []byte, blockSize int) ([]byte, e
 	if err != nil {
 		return nil, err
 	}
-	curPos := blockSize - 1
 	copy(buffer[blockSize:], c2)
-	for {
+	for curPos := blockSize - 1; curPos >= 0; curPos-- {
 		pad := blockSize - curPos
 		if pad > 1 {
 			completeKnownPositions(pad, curPos+1, c1, i2)
@@ -87,11 +86,6 @@ func (a *PaddingOracleAttacker) attackBlock(c2 []byte, blockSize int) ([]byte, e
 				return nil, fmt.Errorf("cant find valid padding for %d pos", curPos)
 			}
 		}
-		if curPos == 0 {
-			break
-		}
-
-		curPos--
 	}
 
 	return i2, nil
